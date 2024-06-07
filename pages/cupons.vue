@@ -1,6 +1,6 @@
 <template>
   <v-container class="justify-center mt-5">
-    <TabelaDados v-if="items.length > 0" @editItem="editItem" @abrirDialog="ativo = true" titulo="address" :loading="loading" @deleteItem="deleteItem" :headers="headers" :items="items"></TabelaDados>
+    <TabelaDados v-if="items.length > 0" @editItem="editItem" @abrirDialog="ativo = true" titulo="cupons" :loading="loading" @deleteItem="deleteItem" :headers="headers" :items="items"></TabelaDados>
     <h1 v-else> Sem items</h1>
   </v-container>
   <v-dialog
@@ -24,36 +24,16 @@
               label="Id"
               placeholder="Identificador"
               disabled
-              v-model="address.id"
+              v-model="cupons.id"
             >
             </v-text-field>
           </v-col>
           <v-col>
             <v-text-field
               variant="outlined"
-              label="zipcode"
-              placeholder="zipcode"
-              v-model="address.zipCode"
-            >
-            </v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-text-field
-              variant="outlined"
-              label="state"
-              placeholder="state"
-              v-model="address.state"
-            >
-            </v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              variant="outlined"
-              label="city"
-              placeholder="city"
-              v-model="address.city"
+              label="code"
+              placeholder="code"
+              v-model="cupons.code"
             >
             </v-text-field>
           </v-col>
@@ -62,9 +42,9 @@
           <v-col>
             <v-text-field
               variant="outlined"
-              label="street"
-              placeholder="street"
-              v-model="address.street"
+              label="type"
+              placeholder="type"
+              v-model="cupons.type"
             >
             </v-text-field>
           </v-col>
@@ -73,20 +53,18 @@
           <v-col>
             <v-text-field
               variant="outlined"
-              label="district"
-              placeholder="district"
-              v-model="address.district"
+              label="value"
+              placeholder="value"
+              v-model="cupons.value"
             >
             </v-text-field>
           </v-col>
-        </v-row>
-        <v-row>
           <v-col>
             <v-text-field
               variant="outlined"
-              label="number"
-              placeholder="number"
-              v-model="address.numberForget"
+              label="uses"
+              placeholder="uses"
+              v-model="cupons.uses"
             >
             </v-text-field>
           </v-col>
@@ -115,14 +93,12 @@ export default {
       ativo: false,
       loading: true,
       textoUsuario: null,
-      address: {
+      cupons: {
         id: null,
-        zipCode: null,
-        state: null,
-        city: null,
-        street: null,
-        district: null,
-        numberForget: null
+        code: null,
+        type: null,
+        value: null,
+        uses: null,
       },
       headers: [
         {
@@ -130,28 +106,20 @@ export default {
           key: 'id'
         },
         {
-          title: 'zipCode',
-          key: 'zipCode'
+          title: 'code',
+          key: 'code'
         },
         {
-          title: 'state',
-          key: 'state'
+          title: 'type',
+          key: 'type'
         },
         {
-          title: 'city',
-          key: 'city'
+          title: 'value',
+          key: 'value'
         },
         {
-          title: 'street',
-          key: 'street'
-        },
-        {
-          title: 'district',
-          key: 'district'
-        },
-        {
-          title: 'numberForget',
-          key: 'numberForget'
+          title: 'uses',
+          key: 'uses'
         },
         {
           title: 'Actions',
@@ -169,7 +137,7 @@ export default {
 
   computed: {
     tituloDialog: function() {
-      return this.address.id ? 'Editar': 'Criar';
+      return this.cupons.id ? 'Editar': 'Criar';
     }
   },
 
@@ -183,30 +151,28 @@ export default {
 
   methods: {
     resetAtividade() {
-      this.address = {
+      this.cupons = {
         id: null,
-        zipcode: null,
-        state: null,
-        city: null,
-        street: null,
-        district: null,
-        numberForget: null,
+        code: null,
+        type: null,
+        value: null,
+        uses: null,
       }
       this.ativo = false;
     },
 
     async persist() {
-      if (this.address.id) {
-        const response = await this.$api.post(`/address/persist/${this.address.id}`, this.address);
+      if (this.cupons.id) {
+        const response = await this.$api.post(`/cupons/persist/${this.cupons.id}`, this.cupons);
       } else {
-        const response = await this.$api.post('/address/persist', this.address);
+        const response = await this.$api.post('/cupons/persist', this.cupons);
       }
       this.resetAtividade()
       await this.getItems();
     },
 
     editItem(item) {
-      this.address = {
+      this.cupons = {
         ...item
       };
       this.ativo = true;
@@ -214,7 +180,7 @@ export default {
 
     async deleteItem(item) {
       if (confirm(`Deseja deletar o registro com id ${item.id}`)) {
-        const response = await this.$api.post('/address/destroy'  );
+        const response = await this.$api.post('/cupons/destroy'  );
         if (response.type == 'error') {
           alert(response.message);
         }
@@ -223,7 +189,7 @@ export default {
     },
 
     async getItems() {
-      const response = await this.$api.get('/address');
+      const response = await this.$api.get('/cupons');
       this.items = response.data;
       this.loading = false;
     }

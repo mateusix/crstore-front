@@ -1,6 +1,6 @@
 <template>
   <v-container class="justify-center mt-5">
-    <TabelaDados v-if="items.length > 0" @editItem="editItem" @abrirDialog="ativo = true" titulo="address" :loading="loading" @deleteItem="deleteItem" :headers="headers" :items="items"></TabelaDados>
+    <TabelaDados v-if="items.length > 0" @editItem="editItem" @abrirDialog="ativo = true" titulo="orders" :loading="loading" @deleteItem="deleteItem" :headers="headers" :items="items"></TabelaDados>
     <h1 v-else> Sem items</h1>
   </v-container>
   <v-dialog
@@ -24,16 +24,16 @@
               label="Id"
               placeholder="Identificador"
               disabled
-              v-model="address.id"
+              v-model="orders.id"
             >
             </v-text-field>
           </v-col>
           <v-col>
             <v-text-field
               variant="outlined"
-              label="zipcode"
-              placeholder="zipcode"
-              v-model="address.zipCode"
+              label="status"
+              placeholder="status"
+              v-model="orders.status"
             >
             </v-text-field>
           </v-col>
@@ -42,18 +42,18 @@
           <v-col>
             <v-text-field
               variant="outlined"
-              label="state"
-              placeholder="state"
-              v-model="address.state"
+              label="totalDiscount"
+              placeholder="totalDiscount"
+              v-model="orders.totalDiscount"
             >
             </v-text-field>
           </v-col>
           <v-col>
             <v-text-field
               variant="outlined"
-              label="city"
-              placeholder="city"
-              v-model="address.city"
+              label="Cupom"
+              placeholder="Cupom"
+              v-model="orders.cupomId"
             >
             </v-text-field>
           </v-col>
@@ -62,36 +62,23 @@
           <v-col>
             <v-text-field
               variant="outlined"
-              label="street"
-              placeholder="street"
-              v-model="address.street"
+              label="ID Endereço"
+              placeholder="ID Endereço"
+              v-model="orders.idAddress"
             >
             </v-text-field>
           </v-col>
-        </v-row>
-        <v-row>
           <v-col>
             <v-text-field
               variant="outlined"
-              label="district"
-              placeholder="district"
-              v-model="address.district"
+              label="ID de Pagamento"
+              placeholder="ID de Pagamento"
+              v-model="orders.paymentId"
             >
             </v-text-field>
           </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-text-field
-              variant="outlined"
-              label="number"
-              placeholder="number"
-              v-model="address.numberForget"
-            >
-            </v-text-field>
-          </v-col>
-        </v-row>
-      </v-card-text>
+        </v-row>        
+      </v-card-text> 
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
@@ -115,14 +102,10 @@ export default {
       ativo: false,
       loading: true,
       textoUsuario: null,
-      address: {
+      orders: {
         id: null,
-        zipCode: null,
-        state: null,
-        city: null,
-        street: null,
-        district: null,
-        numberForget: null
+        status: null,
+        totalDiscount: null,
       },
       headers: [
         {
@@ -130,28 +113,24 @@ export default {
           key: 'id'
         },
         {
-          title: 'zipCode',
-          key: 'zipCode'
+          title: 'status',
+          key: 'status'
         },
         {
-          title: 'state',
-          key: 'state'
+          title: 'Desconto',
+          key: 'totalDiscount'
         },
         {
-          title: 'city',
-          key: 'city'
+          title: 'ID Cupom',
+          key: 'cupomId'
         },
         {
-          title: 'street',
-          key: 'street'
+          title: 'Id Endereço',
+          key: 'idAddress'
         },
         {
-          title: 'district',
-          key: 'district'
-        },
-        {
-          title: 'numberForget',
-          key: 'numberForget'
+          title: 'ID Pagamento',
+          key: 'paymentId'
         },
         {
           title: 'Actions',
@@ -169,7 +148,7 @@ export default {
 
   computed: {
     tituloDialog: function() {
-      return this.address.id ? 'Editar': 'Criar';
+      return this.orders.id ? 'Editar': 'Criar';
     }
   },
 
@@ -183,30 +162,26 @@ export default {
 
   methods: {
     resetAtividade() {
-      this.address = {
+      this.orders = {
         id: null,
-        zipcode: null,
-        state: null,
-        city: null,
-        street: null,
-        district: null,
-        numberForget: null,
+        status: null,
+        totalDiscount: null,
       }
       this.ativo = false;
     },
 
     async persist() {
-      if (this.address.id) {
-        const response = await this.$api.post(`/address/persist/${this.address.id}`, this.address);
+      if (this.orders.id) {
+        const response = await this.$api.post(`/orders/persist/${this.orders.id}`, this.orders);
       } else {
-        const response = await this.$api.post('/address/persist', this.address);
+        const response = await this.$api.post('/orders/persist', this.orders);
       }
       this.resetAtividade()
       await this.getItems();
     },
 
     editItem(item) {
-      this.address = {
+      this.orders = {
         ...item
       };
       this.ativo = true;
@@ -214,7 +189,7 @@ export default {
 
     async deleteItem(item) {
       if (confirm(`Deseja deletar o registro com id ${item.id}`)) {
-        const response = await this.$api.post('/address/destroy'  );
+        const response = await this.$api.post('/orders/destroy'  );
         if (response.type == 'error') {
           alert(response.message);
         }
@@ -223,7 +198,7 @@ export default {
     },
 
     async getItems() {
-      const response = await this.$api.get('/address');
+      const response = await this.$api.get('/orders');
       this.items = response.data;
       this.loading = false;
     }

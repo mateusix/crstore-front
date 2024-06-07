@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 const temaCustomizado = {
-  dark: true,
+  dark: false,
   colors: {
     background: '#660000',
     surface: '#FFFFFF',
@@ -17,7 +17,7 @@ const temaCustomizado = {
 };
 
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   modules: ["vuetify-nuxt-module", '@nuxt/eslint'],
   plugins: ['~/plugins/axios.js'],
   vuetify: {
@@ -33,13 +33,10 @@ export default defineNuxtConfig({
 
     moduleOptions: {
       /* nuxt-vuetify module options */
-      treeshaking: true || false,
-      useIconCDN: true || false,
+      treeshaking: true,
 
       /* vite-plugin-vuetify options */
-      styles: true || 'none' || 'expose' || 'sass' || { configFile: String },
-      autoImport: true || false,
-      useVuetifyLabs: true || false,
+      autoImport: true ,
     },
   },
 })

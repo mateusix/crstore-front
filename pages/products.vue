@@ -1,6 +1,6 @@
 <template>
   <v-container class="justify-center mt-5">
-    <TabelaDados v-if="items.length > 0" @editItem="editItem" @abrirDialog="ativo = true" titulo="address" :loading="loading" @deleteItem="deleteItem" :headers="headers" :items="items"></TabelaDados>
+    <TabelaDados v-if="items.length > 0" @editItem="editItem" @abrirDialog="ativo = true" titulo="products" :loading="loading" @deleteItem="deleteItem" :headers="headers" :items="items"></TabelaDados>
     <h1 v-else> Sem items</h1>
   </v-container>
   <v-dialog
@@ -24,36 +24,16 @@
               label="Id"
               placeholder="Identificador"
               disabled
-              v-model="address.id"
+              v-model="products.id"
             >
             </v-text-field>
           </v-col>
           <v-col>
             <v-text-field
               variant="outlined"
-              label="zipcode"
-              placeholder="zipcode"
-              v-model="address.zipCode"
-            >
-            </v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-text-field
-              variant="outlined"
-              label="state"
-              placeholder="state"
-              v-model="address.state"
-            >
-            </v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              variant="outlined"
-              label="city"
-              placeholder="city"
-              v-model="address.city"
+              label="name"
+              placeholder="name"
+              v-model="products.name"
             >
             </v-text-field>
           </v-col>
@@ -62,9 +42,18 @@
           <v-col>
             <v-text-field
               variant="outlined"
-              label="street"
-              placeholder="street"
-              v-model="address.street"
+              label="price"
+              placeholder="price"
+              v-model="products.price"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              variant="outlined"
+              label="image"
+              placeholder="image"
+              v-model="products.image"
             >
             </v-text-field>
           </v-col>
@@ -73,20 +62,9 @@
           <v-col>
             <v-text-field
               variant="outlined"
-              label="district"
-              placeholder="district"
-              v-model="address.district"
-            >
-            </v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-text-field
-              variant="outlined"
-              label="number"
-              placeholder="number"
-              v-model="address.numberForget"
+              label="description"
+              placeholder="description"
+              v-model="products.description"
             >
             </v-text-field>
           </v-col>
@@ -115,14 +93,12 @@ export default {
       ativo: false,
       loading: true,
       textoUsuario: null,
-      address: {
+      products: {
         id: null,
-        zipCode: null,
-        state: null,
-        city: null,
-        street: null,
-        district: null,
-        numberForget: null
+        name: null,
+        price: null,
+        image: null,
+        description: null,        
       },
       headers: [
         {
@@ -130,29 +106,21 @@ export default {
           key: 'id'
         },
         {
-          title: 'zipCode',
-          key: 'zipCode'
+          title: 'name',
+          key: 'name'
         },
         {
-          title: 'state',
-          key: 'state'
+          title: 'price',
+          key: 'price'
         },
         {
-          title: 'city',
-          key: 'city'
+          title: 'image',
+          key: 'image'
         },
         {
-          title: 'street',
-          key: 'street'
-        },
-        {
-          title: 'district',
-          key: 'district'
-        },
-        {
-          title: 'numberForget',
-          key: 'numberForget'
-        },
+          title: 'description',
+          key: 'description'
+        },        
         {
           title: 'Actions',
           key: 'actions',
@@ -169,7 +137,7 @@ export default {
 
   computed: {
     tituloDialog: function() {
-      return this.address.id ? 'Editar': 'Criar';
+      return this.products.id ? 'Editar': 'Criar';
     }
   },
 
@@ -183,30 +151,28 @@ export default {
 
   methods: {
     resetAtividade() {
-      this.address = {
+      this.products = {
         id: null,
-        zipcode: null,
-        state: null,
-        city: null,
-        street: null,
-        district: null,
-        numberForget: null,
+        name: null,
+        price: null,
+        image: null,
+        description: null,        
       }
       this.ativo = false;
     },
 
     async persist() {
-      if (this.address.id) {
-        const response = await this.$api.post(`/address/persist/${this.address.id}`, this.address);
+      if (this.products.id) {
+        const response = await this.$api.post(`/products/persist/${this.products.id}`, this.products);
       } else {
-        const response = await this.$api.post('/address/persist', this.address);
+        const response = await this.$api.post('/products/persist', this.products);
       }
       this.resetAtividade()
       await this.getItems();
     },
 
     editItem(item) {
-      this.address = {
+      this.products = {
         ...item
       };
       this.ativo = true;
@@ -214,7 +180,7 @@ export default {
 
     async deleteItem(item) {
       if (confirm(`Deseja deletar o registro com id ${item.id}`)) {
-        const response = await this.$api.post('/address/destroy'  );
+        const response = await this.$api.post('/products/destroy'  );
         if (response.type == 'error') {
           alert(response.message);
         }
@@ -223,9 +189,10 @@ export default {
     },
 
     async getItems() {
-      const response = await this.$api.get('/address');
+      const response = await this.$api.get('/products');
       this.items = response.data;
       this.loading = false;
+      console.log(this.items)
     }
   }
 }
